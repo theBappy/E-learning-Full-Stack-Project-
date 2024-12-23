@@ -3,6 +3,9 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
 
+// Routes Imports
+const authRoutes = require('./routes/authRoutes');
+
 dotenv.config();
 
 const app = express();
@@ -13,6 +16,9 @@ app.use(cors());
 app.get('/', (req,res)=>{
     res.send('E-Learning Platform API')
 });
+
+// Routes
+app.use('/api/auth', authRoutes);
 
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI).then(()=> console.log('MongoDB connected'))
