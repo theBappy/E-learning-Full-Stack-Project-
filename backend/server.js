@@ -15,5 +15,10 @@ app.get('/', (req,res)=>{
 });
 
 // MongoDB connection
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect(process.env.MONGO_URI).then(()=> console.log('MongoDB connected'))
+.catch((err)=> console.error('MongoDB Connecetion failed: ', err));
+
+// Star Server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, ()=> console.log(`Server is running on port ${PORT}...`));
 
