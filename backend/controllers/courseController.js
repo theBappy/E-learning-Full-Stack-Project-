@@ -72,7 +72,7 @@ exports.deleteCourse = async (req, res) => {
       return res.status(403).json({ error: 'Unauthorized to delete this course' });
     }
 
-    await course.remove();
+    await course.deleteOne();
     res.status(200).json({ message: 'Course deleted successfully' });
   } catch (err) {
     res.status(400).json({ error: err.message });

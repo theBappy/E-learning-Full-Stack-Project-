@@ -6,6 +6,7 @@ const cors = require('cors');
 // Routes Imports
 const authRoutes = require('./routes/authRoutes');
 const courseRoutes = require('./routes/courseRoutes');
+const adminRoutes = require('./routes/adminRoute');
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ app.get('/', (req,res)=>{
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/course', courseRoutes);
+app.use('/api/user-role', adminRoutes);
 
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI).then(()=> console.log('MongoDB connected'))
