@@ -25,6 +25,10 @@ const CourseSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    studentsEnrolled: [{
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'User',
+    }],
 }, {timestamps: true});
 
 const Course = mongoose.model('Course', CourseSchema);
