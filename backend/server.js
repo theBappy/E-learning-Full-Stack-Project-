@@ -8,6 +8,7 @@ const authRoutes = require('./routes/authRoutes');
 const courseRoutes = require('./routes/courseRoutes');
 const adminRoutes = require('./routes/adminRoute');
 const enrollmentRoutes = require('./routes/enrollmentRoutes');
+const lessonRoutes = require('./routes/lessonRoutes');
 
 dotenv.config();
 
@@ -25,6 +26,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/course', courseRoutes);
 app.use('/api/user-role', adminRoutes);
 app.use('/api/enroll', enrollmentRoutes);
+app.use('/api/lesson', lessonRoutes);
 
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI).then(()=> console.log('MongoDB connected'))
