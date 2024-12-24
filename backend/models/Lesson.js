@@ -14,6 +14,10 @@ const LessonSchema = new mongoose.Schema({
         ref: 'Course',
         required: true,
     },
+    videoUrl: {
+        type: String,
+        default: null,
+    }
     createdAt: {
         type: Date,
         default: Date.now(),
