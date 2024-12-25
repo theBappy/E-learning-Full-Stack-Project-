@@ -6,7 +6,7 @@ const {
   updateCourse,
   deleteCourse,
 } = require('../controllers/courseController');
-const { protect } = require('../middleware/authMiddleware');
+const checkRole = require('../middleware/role');
 
 const router = express.Router();
 
@@ -14,10 +14,10 @@ const router = express.Router();
 router.get('/', getAllCourses);
 router.get('/:id', getCourseById);
 
-// Protected routes (Instructor only)
-router.post('/', protect, addCourse);
-router.put('/:id', protect, updateCourse);
-router.delete('/:id', protect, deleteCourse);
+// Protected routes (Instructor and Admin)
+router.post('/',  checkRole(['admin', 'instructor']), addCourse);
+router.put('/:id',checkRole(['admin', 'instructor']), updateCourse);
+router.delete('/:id', checkRole(['admin']), deleteCourse);
 
 module.exports = router;
 

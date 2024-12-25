@@ -3,6 +3,7 @@ const User = require('../models/User');
 const express = require('express');
 const router = express.Router();
 
+
 router.patch('/update-role', protect, isAdmin, async (req, res) => {
     const { email, role } = req.body;
   

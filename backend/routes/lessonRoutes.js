@@ -9,19 +9,20 @@ const {
     getLessonDetails,
 } = require('../controllers/lessonController');
 const upload = require('../utils/multer');
+const checkRole = require('../middleware/role');
 
 const router = express.Router();
 
 // Routes for managing a lesson
-router.post('/create', protect, createLesson);
 router.get('/:courseId', protect, getLessonsByCourse);
-router.put('/:id', protect, updateLesson);
-router.delete('/:id', protect, deleteLesson);
+router.post('/create', checkRole(['admin', 'instructor']), createLesson);
+router.put('/:id', checkRole(['admin', 'instructor']), updateLesson);
+router.delete('/:id', checkRole(['admin']), deleteLesson);
 
 // Lesson Details Routes
 router.get('/enrolled/:id' , protect, getLessonDetails);
 
 // New Routes for videos upload
-router.post('/upload/:lessonId', protect, upload.single('video'), uploadVideo)
+router.post('/upload/:lessonId', checkRole(['admin', 'instructor']), upload.single('video'), uploadVideo)
 
 module.exports = router;
