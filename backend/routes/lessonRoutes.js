@@ -4,7 +4,8 @@ const {
     createLesson,
     getLessonsByCourse,
     updateLesson,
-    deleteLesson, 
+    deleteLesson,
+    uploadVideo, 
 } = require('../controllers/lessonController');
 const upload = require('../utils/multer');
 
@@ -17,6 +18,6 @@ router.put('/:id', protect, updateLesson);
 router.delete('/:id', protect, deleteLesson);
 
 // New Routes for videos upload
-
+router.post('/upload/:lessonId', protect, upload.single('video'), uploadVideo)
 
 module.exports = router;

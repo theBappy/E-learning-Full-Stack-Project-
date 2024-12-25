@@ -1,5 +1,6 @@
 const Lesson = require('../models/Lesson');
 const Course = require('../models/Course');
+const cloudinary = require('../utils/cloudinary');
 
 // Create a lesson
 exports.createLesson = async (req, res) => {
@@ -80,3 +81,48 @@ exports.deleteLesson = async (req, res) => {
   }
 };
 
+
+// Add video upload functionlity 
+exports.uploadVideo = async (req, res) => {
+  try {
+    const lesson = await Lesson.findById(req.params.lessonId);
+    if (!lesson) {
+      return res.status(404).json({ error: 'Lesson not found' });
+    }
+
+    // Update lesson with uploaded video URL
+    lesson.videoUrl = req.file.path; // File path from Cloudinary
+    await lesson.save();
+
+    res.json({ message: 'Video uploaded successfully', lesson });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+
+// GetLessonDetails
+exports.getLessonDetails = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+      // Fetch the lesson details
+      const lesson = await Lesson.findById(id);
+      if (!lesson) {
+          return res.status(404).json({ error: 'Lesson not found' });
+      }
+
+      // Check if the user is enrolled in the course
+      const isEnrolled = await Course.findOne({
+          _id: lesson.course,
+          students: req.user._id,
+      });
+      if (!isEnrolled) {
+          return res.status(403).json({ error: 'Access denied. Not enrolled.' });
+      }
+
+      res.json(lesson);
+  } catch (error) {
+      res.status(500).json({ error: 'Internal server error' });
+  }
+};
