@@ -115,7 +115,7 @@ exports.getLessonDetails = async (req, res) => {
       // Check if the user is enrolled in the course
       const isEnrolled = await Course.findOne({
           _id: lesson.course,
-          students: req.user._id,
+          studentsEnrolled: req.user._id,
       });
       if (!isEnrolled) {
           return res.status(403).json({ error: 'Access denied. Not enrolled.' });
