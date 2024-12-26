@@ -13,8 +13,8 @@ exports.createLesson = async (req, res) => {
     }
 
     // Ensure the instructor is creating the lesson
-    if (course.instructor.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ error: 'Access denied. Only the course instructor can add lessons.' });
+    if (req.user.role !== 'instructor' && req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Access denied. Only admin and the course instructor can add lessons.' });
     }
 
     const lesson = await Lesson.create({ title, content, course: courseId });
@@ -46,8 +46,8 @@ exports.updateLesson = async (req, res) => {
 
     // Check if the user is the instructor of the course
     const course = await Course.findById(lesson.course);
-    if (course.instructor.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ error: 'Access denied. Only the course instructor can edit lessons.' });
+    if (req.user.role !== 'instructor' && req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Access denied. Only the admin and the course instructor can edit lessons.' });
     }
 
     lesson.title = title || lesson.title;
@@ -70,8 +70,8 @@ exports.deleteLesson = async (req, res) => {
 
     // Check if the user is the instructor of the course
     const course = await Course.findById(lesson.course);
-    if (course.instructor.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ error: 'Access denied. Only the course instructor can delete lessons.' });
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Access denied. Only admin can delete the lessons.' });
     }
 
     await lesson.deleteOne();

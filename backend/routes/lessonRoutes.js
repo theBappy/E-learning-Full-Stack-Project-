@@ -23,6 +23,6 @@ router.delete('/:id', checkRole(['admin']), deleteLesson);
 router.get('/enrolled/:id' , protect, getLessonDetails);
 
 // New Routes for videos upload
-router.post('/upload/:lessonId', checkRole(['admin', 'instructor']), upload.single('video'), uploadVideo)
+router.post('/upload/:lessonId', protect, upload.single('video'), uploadVideo)
 
 module.exports = router;

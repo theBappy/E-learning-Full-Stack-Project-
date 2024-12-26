@@ -5,8 +5,8 @@ exports.addCourse = async (req, res) => {
   const { title, description, price, media } = req.body;
 
   try {
-    if (req.user.role !== 'instructor') {
-      return res.status(403).json({ error: 'Only instructors can add courses' });
+    if (req.user.role !== 'instructor' && req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Only admin and instructors can add courses' });
     }
 
     const course = new Course({
@@ -50,7 +50,7 @@ exports.updateCourse = async (req, res) => {
     const course = await Course.findById(req.params.id);
 
     if (!course) throw new Error('Course not found');
-    if (course.instructor.toString() !== req.user.id) {
+    if (req.user.role !== 'instructor' && req.user.role !== 'admin') {
       return res.status(403).json({ error: 'Unauthorized to update this course' });
     }
 
@@ -68,7 +68,7 @@ exports.deleteCourse = async (req, res) => {
     const course = await Course.findById(req.params.id);
 
     if (!course) throw new Error('Course not found');
-    if (course.instructor.toString() !== req.user.id) {
+    if (req.user.role !== 'admin') {
       return res.status(403).json({ error: 'Unauthorized to delete this course' });
     }
 
