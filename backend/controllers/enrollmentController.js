@@ -1,4 +1,5 @@
 const Course = require('../models/Course');
+const io = require('socket.io');
 
 exports.enrollInACourse = async (req, res) => {
     try {
@@ -14,7 +15,9 @@ exports.enrollInACourse = async (req, res) => {
       }
   
       course.studentsEnrolled.push(req.user._id);
+      io.emit('courseEnrolled', {course, userId});
       await course.save();
+
   
       res.json({ message: 'Enrolled successfully', course });
     } catch (error) {

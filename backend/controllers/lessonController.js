@@ -126,3 +126,27 @@ exports.getLessonDetails = async (req, res) => {
       res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+exports.addComment = async (req, res) => {
+  try {
+      const { lessonId } = req.params;
+      const { userId, comment } = req.body;
+
+      const lesson = await Lesson.findById(lessonId);
+      if (!lesson) return res.status(404).json({ message: 'Lesson not found' });
+
+      lesson.comments.push({ userId, comment });
+      await lesson.save();
+
+      // Notify the instructor
+      io.to(`instructor_${lesson.instructor}`).emit('newComment', { 
+          lessonId, 
+          comment, 
+          userId 
+      });
+
+      res.status(200).json({ success: true, message: 'Comment added' });
+  } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+  }
+};

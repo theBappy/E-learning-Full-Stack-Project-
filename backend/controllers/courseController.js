@@ -1,4 +1,6 @@
 const Course = require('../models/Course');
+const io = require('socket.io');
+
 
 // Add a new course (Instructor only)
 exports.addCourse = async (req, res) => {
@@ -17,6 +19,7 @@ exports.addCourse = async (req, res) => {
       instructor: req.user.id,
     });
     await course.save();
+    io.emit('courseCreated', { course });
     res.status(201).json({ message: 'Course added successfully', course });
   } catch (err) {
     res.status(400).json({ error: err.message });

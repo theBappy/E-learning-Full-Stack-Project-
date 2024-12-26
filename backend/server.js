@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const http = require('http');
 const socketIo =require('socket.io');
 
 // Routes Imports
@@ -28,9 +29,14 @@ app.get('/', (req,res)=>{
 io.on('connection', (socket)=>{
     console.log('A user connected');
 
+    socket.on('joinRoom', (userId)=>{
+        socket.join(userId);
+        console.log(`User ${userId} joined their room`)
+    });
+
     socket.on('disconnect', ()=>{
         console.log('A user disconnect');
-    })
+    });
 });
 
 // Routes
