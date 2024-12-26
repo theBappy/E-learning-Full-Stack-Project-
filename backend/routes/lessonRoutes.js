@@ -8,6 +8,7 @@ const {
     uploadVideo,
     getLessonDetails,
     addComment,
+    getComments,
 } = require('../controllers/lessonController');
 const upload = require('../utils/multer');
 const checkRole = require('../middleware/role');
@@ -28,5 +29,6 @@ router.post('/upload/:lessonId', protect, upload.single('video'), uploadVideo);
 
 // Commnent in a lesson
 router.post('/:lessonId/comments', protect, addComment);
+router.get('/:lessonId/comments', protect, getComments);
 
 module.exports = router;

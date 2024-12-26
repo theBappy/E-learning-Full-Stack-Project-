@@ -2,6 +2,7 @@ const Lesson = require('../models/Lesson');
 const Course = require('../models/Course');
 const cloudinary = require('../utils/cloudinary');
 
+
 // Create a lesson
 exports.createLesson = async (req, res) => {
   const { title, content, courseId } = req.body;
@@ -22,6 +23,7 @@ exports.createLesson = async (req, res) => {
     await course.save();
 
     // Notify enrolled students
+    const io = req.io;
     const studentsEnrolled = course.studentsEnrolled;
     studentsEnrolled.forEach((studentId)=>{
       io.to(`student_${studentId}`).emit('newLesson', {
@@ -148,6 +150,11 @@ exports.addComment = async (req, res) => {
     const lesson = await Lesson.findById(lessonId);
     if (!lesson) return res.status(404).json({ message: 'Lesson not found' });
 
+    // Check if the instructor field exists
+    if (!lesson.instructor) {
+      return res.status(400).json({ success: false, message: 'Lesson has no instructor assigned.' });
+    }
+
     // Ensure the comments array exists
     if (!Array.isArray(lesson.comments)) {
       lesson.comments = [];
@@ -156,7 +163,9 @@ exports.addComment = async (req, res) => {
     // Add the comment
     lesson.comments.push({ userId, comment });
     await lesson.save();
+    
 
+    const io = req.io;
     // Notify the instructor via WebSocket
     io.to(`instructor_${lesson.instructor}`).emit('newComment', { 
       lessonId, 
@@ -165,6 +174,36 @@ exports.addComment = async (req, res) => {
     });
 
     res.status(200).json({ success: true, message: 'Comment added' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+
+exports.getComments = async (req, res) => {
+  try {
+    const { lessonId } = req.params;
+    const userId = req.user.id;
+
+    // Find the lesson
+    const lesson = await Lesson.findById(lessonId).populate('comments.userId', 'name email');
+    if (!lesson) return res.status(404).json({ success: false, message: 'Lesson not found' });
+
+    // Check if the user is authorized (enrolled student or instructor)
+    const isEnrolled = await Course.findOne({
+      _id: lesson.course,
+      studentsEnrolled: req.user._id,
+    });
+    
+    if (
+      lesson.instructor.toString() !== userId && 
+      (!isEnrolled)
+    ) {
+      return res.status(403).json({ success: false, message: 'Access denied' });
+    }
+
+    // Return comments
+    res.status(200).json({ success: true, comments: lesson.comments });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

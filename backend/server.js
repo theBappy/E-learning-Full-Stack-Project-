@@ -3,7 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const http = require('http');
-const socketIo =require('socket.io');
+const { Server } = require('socket.io');
 
 // Routes Imports
 const authRoutes = require('./routes/authRoutes');
@@ -12,30 +12,40 @@ const adminRoutes = require('./routes/adminRoute');
 const enrollmentRoutes = require('./routes/enrollmentRoutes');
 const lessonRoutes = require('./routes/lessonRoutes');
 
-
-
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = new Server(server, {
+    cors: {
+        origin: '*', // Adjust based on your frontend URL
+    },
+});
+
+// Middleware
 app.use(express.json());
 app.use(cors());
 
+// Attach Socket.IO to requests
+app.use((req, res, next) => {
+    req.io = io; // Make io available in all routes
+    next();
+});
+
 // Basic route
-app.get('/', (req,res)=>{
-    res.send('E-Learning Platform API')
+app.get('/', (req, res) => {
+    res.send('E-Learning Platform API');
 });
 
 // Socket.IO connection
-io.on('connection', (socket)=>{
+io.on('connection', (socket) => {
     console.log('A user connected');
 
-    socket.on('joinRoom', (userId)=>{
+    socket.on('joinRoom', (userId) => {
         socket.join(userId);
-        console.log(`User ${userId} joined their room`)
+        console.log(`User ${userId} joined their room`);
     });
 
-    socket.on('disconnect', ()=>{
-        console.log('A user disconnect');
+    socket.on('disconnect', () => {
+        console.log('A user disconnected');
     });
 });
 
@@ -47,11 +57,11 @@ app.use('/api/enroll', enrollmentRoutes);
 app.use('/api/lesson', lessonRoutes);
 
 // MongoDB connection
-mongoose.connect(process.env.MONGO_URI).then(()=> console.log('MongoDB connected'))
-.catch((err)=> console.error('MongoDB Connecetion failed: ', err));
+mongoose
+    .connect(process.env.MONGO_URI)
+    .then(() => console.log('MongoDB connected'))
+    .catch((err) => console.error('MongoDB connection failed: ', err));
 
-
-// Star Server
+// Start server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, ()=> console.log(`Server is running on port ${PORT}...`));
-
+server.listen(PORT, () => console.log(`Server is running on port ${PORT}...`));
