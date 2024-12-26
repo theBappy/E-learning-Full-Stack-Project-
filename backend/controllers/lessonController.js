@@ -19,6 +19,8 @@ exports.createLesson = async (req, res) => {
     }
 
     const lesson = await Lesson.create({ title, content, course: courseId });
+    await lesson.save();
+
     course.lessons.push(lesson._id);
     await course.save();
 
@@ -29,7 +31,7 @@ exports.createLesson = async (req, res) => {
       io.to(`student_${studentId}`).emit('newLesson', {
         courseId,
         lessonId: lesson._id,
-        title,
+        title: lesson.title,
       });
     });
     res.status(201).json({ message: 'Lesson created successfully', lesson });
@@ -166,14 +168,16 @@ exports.addComment = async (req, res) => {
     
 
     const io = req.io;
+    const instructorRoom = `instructor_${lesson.instructor._id}`;
     // Notify the instructor via WebSocket
-    io.to(`instructor_${lesson.instructor}`).emit('newComment', { 
+    io.to(instructorRoom).emit('newCommentNotification', { 
       lessonId, 
       comment, 
-      userId 
+      userId,
+      instructor: lesson.instructor.name,
     });
 
-    res.status(200).json({ success: true, message: 'Comment added' });
+    res.status(200).json({ success: true, message: 'Comment added and instructor notified' });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

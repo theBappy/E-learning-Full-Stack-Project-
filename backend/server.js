@@ -5,6 +5,7 @@ const cors = require('cors');
 const http = require('http');
 const { Server } = require('socket.io');
 
+
 // Routes Imports
 const authRoutes = require('./routes/authRoutes');
 const courseRoutes = require('./routes/courseRoutes');
@@ -39,11 +40,19 @@ app.get('/', (req, res) => {
 io.on('connection', (socket) => {
     console.log('A user connected');
 
-    socket.on('joinRoom', (userId) => {
-        socket.join(userId);
-        console.log(`User ${userId} joined their room`);
+    // Join room logic
+    socket.on('joinInstructorRoom', (instructorId) => {
+        const instructorRoom = `instructor_${instructorId}`;
+        socket.join(instructorRoom);
+        console.log(`Instructor joined room: ${instructorRoom}`);
     });
 
+    socket.on('joinStudentRoom', (studentId) => {
+        const studentRoom = `student_${studentId}`;
+        socket.join(studentRoom);
+        console.log(`Student joined room: ${studentRoom}`);
+    });
+    
     socket.on('disconnect', () => {
         console.log('A user disconnected');
     });
