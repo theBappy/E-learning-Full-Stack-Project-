@@ -7,6 +7,7 @@ const {
     deleteLesson,
     uploadVideo,
     getLessonDetails,
+    addComment,
 } = require('../controllers/lessonController');
 const upload = require('../utils/multer');
 const checkRole = require('../middleware/role');
@@ -23,6 +24,9 @@ router.delete('/:id', checkRole(['admin']), deleteLesson);
 router.get('/enrolled/:id' , protect, getLessonDetails);
 
 // New Routes for videos upload
-router.post('/upload/:lessonId', protect, upload.single('video'), uploadVideo)
+router.post('/upload/:lessonId', protect, upload.single('video'), uploadVideo);
+
+// Commnent in a lesson
+router.post('/:lessonId/comments', protect, addComment);
 
 module.exports = router;

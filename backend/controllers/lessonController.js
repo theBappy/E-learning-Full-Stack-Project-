@@ -18,6 +18,18 @@ exports.createLesson = async (req, res) => {
     }
 
     const lesson = await Lesson.create({ title, content, course: courseId });
+    course.lessons.push(lesson._id);
+    await course.save();
+
+    // Notify enrolled students
+    const studentsEnrolled = course.studentsEnrolled;
+    studentsEnrolled.forEach((studentId)=>{
+      io.to(`student_${studentId}`).emit('newLesson', {
+        courseId,
+        lessonId: lesson._id,
+        title,
+      });
+    });
     res.status(201).json({ message: 'Lesson created successfully', lesson });
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
@@ -129,24 +141,31 @@ exports.getLessonDetails = async (req, res) => {
 
 exports.addComment = async (req, res) => {
   try {
-      const { lessonId } = req.params;
-      const { userId, comment } = req.body;
+    const { lessonId } = req.params;
+    const { userId, comment } = req.body;
 
-      const lesson = await Lesson.findById(lessonId);
-      if (!lesson) return res.status(404).json({ message: 'Lesson not found' });
+    // Find the lesson by ID
+    const lesson = await Lesson.findById(lessonId);
+    if (!lesson) return res.status(404).json({ message: 'Lesson not found' });
 
-      lesson.comments.push({ userId, comment });
-      await lesson.save();
+    // Ensure the comments array exists
+    if (!Array.isArray(lesson.comments)) {
+      lesson.comments = [];
+    }
 
-      // Notify the instructor
-      io.to(`instructor_${lesson.instructor}`).emit('newComment', { 
-          lessonId, 
-          comment, 
-          userId 
-      });
+    // Add the comment
+    lesson.comments.push({ userId, comment });
+    await lesson.save();
 
-      res.status(200).json({ success: true, message: 'Comment added' });
+    // Notify the instructor via WebSocket
+    io.to(`instructor_${lesson.instructor}`).emit('newComment', { 
+      lessonId, 
+      comment, 
+      userId 
+    });
+
+    res.status(200).json({ success: true, message: 'Comment added' });
   } catch (error) {
-      res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 };
