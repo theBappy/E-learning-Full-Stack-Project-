@@ -1,5 +1,5 @@
-const Message = require('../models/messageModel');
-const User = require('../models/userModel');
+const Message = require('../models/Message');
+const User = require('../models/User');
 
 // Send a new message
 exports.sendMessage = async (req, res) => {

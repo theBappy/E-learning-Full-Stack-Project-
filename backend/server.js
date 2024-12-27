@@ -12,6 +12,8 @@ const courseRoutes = require('./routes/courseRoutes');
 const adminRoutes = require('./routes/adminRoute');
 const enrollmentRoutes = require('./routes/enrollmentRoutes');
 const lessonRoutes = require('./routes/lessonRoutes');
+const messageRoutes = require('./routes/messageRoutes');
+
 
 const app = express();
 const server = http.createServer(app);
@@ -52,6 +54,12 @@ io.on('connection', (socket) => {
         socket.join(studentRoom);
         console.log(`Student joined room: ${studentRoom}`);
     });
+
+     // Join user-specific room
+    socket.on('joinUserRoom', (userId) => {
+        socket.join(`user_${userId}`);
+        console.log(`User joined room: user_${userId}`);
+    });
     
     socket.on('disconnect', () => {
         console.log('A user disconnected');
@@ -64,6 +72,7 @@ app.use('/api/course', courseRoutes);
 app.use('/api/user-role', adminRoutes);
 app.use('/api/enroll', enrollmentRoutes);
 app.use('/api/lesson', lessonRoutes);
+app.use('/api/messages/send-receive', messageRoutes);
 
 // MongoDB connection
 mongoose

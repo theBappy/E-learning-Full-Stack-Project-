@@ -2,10 +2,10 @@
 
 E-learning(Root)
 -->backend 
-        -->controllers(auth, course, enrollment, lesson, viewenroll)
-        --> middleware(auth)
-        --> models(course,lesson,user)
-        -->routes(admin,auth,course,enrollment,lesson)
+        -->controllers(auth, course, enrollment, lesson, viewenroll,message)
+        --> middleware(auth, role)
+        --> models(course,lesson,user,message)
+        -->routes(admin,auth,course,enrollment,lesson,message)
         -->utils(cloudinary, multer)
         -->node_modules
         -->.env
