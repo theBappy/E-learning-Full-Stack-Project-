@@ -9,7 +9,7 @@ const Sidebar = ({ role }) => {
 
   const adminLinks = [
     { name: 'Manage Users', path: '/admin/users' },
-    { name: 'Manage Courses', path: '/admin/courses' },
+    { name: 'View Courses', path: '/admin/courses' },
   ];
 
   const instructorLinks = [
@@ -17,10 +17,15 @@ const Sidebar = ({ role }) => {
     { name: 'Create Course', path: '/instructor/create-course' },
   ];
 
+  const studentLinks = [
+    { name: 'My Enrollments', path: '/student/enrollments' },
+    { name: 'View Lessons', path: '/student/lessons' },
+  ];
+
   const roleBasedLinks = {
     admin: adminLinks,
     instructor: instructorLinks,
-    student: [],
+    student: studentLinks,
   };
 
   return (
@@ -42,5 +47,6 @@ const Sidebar = ({ role }) => {
     </aside>
   );
 };
+
 
 export default Sidebar;
