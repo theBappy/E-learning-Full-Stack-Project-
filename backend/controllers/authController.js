@@ -31,14 +31,16 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.getProfile = async(req,res) =>{
-  try{
+exports.getProfile = async (req, res) => {
+  try {
+    // Find user by ID from the JWT payload
     const user = await User.findById(req.user.id).select('-password');
-    if(!user){
-      return res.status(404).json({message: 'User not found'})
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
     }
-    res.jons({ user })
-  } catch(error){
-    console.error(err)
+    res.json({ user });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ message: 'Server error' });
   }
-}
+};

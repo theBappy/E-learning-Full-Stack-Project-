@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import Sidebar from '../components/Sidebar';
+import ProfileSection from '../components/ProfileSection';
 import axios from 'axios';
 
-const Dashboard = () => {
+const Profile = () => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -16,7 +16,7 @@ const Dashboard = () => {
         });
         setUser(data.user);
       } catch (error) {
-        console.error('Error fetching user:', error);
+        console.error('Error fetching user profile:', error);
       }
     };
 
@@ -26,15 +26,10 @@ const Dashboard = () => {
   if (!user) return <p>Loading...</p>;
 
   return (
-    <div className="dashboard">
-      <Sidebar role={user.role} />
-      <main>
-        <h1>Welcome, {user.name}</h1>
-        {/* Add additional dashboard content here */}
-      </main>
+    <div className="profile">
+      <ProfileSection user={user} />
     </div>
   );
 };
 
-export default Dashboard;
-
+export default Profile;
