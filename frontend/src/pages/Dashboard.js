@@ -3,6 +3,7 @@ import Sidebar from '../components/Sidebar';
 import axios from 'axios';
 import AdminDashboard from '../components/AdminDashboard';
 import InstructorDashboard from '../components/InstructorDashboard';
+import StudentDashboard from '../components/StudentDashboard';
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
