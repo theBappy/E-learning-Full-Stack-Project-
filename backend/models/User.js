@@ -8,7 +8,7 @@ const UserSchema = new mongoose.Schema({
     },
     email: {
         type: String,
-        required: [true, 'Please provide an valid email'],
+        required: [true, 'Please provide a valid email'],
         unique: true,
     },
     password: {
@@ -20,13 +20,18 @@ const UserSchema = new mongoose.Schema({
         enum: ['student', 'instructor', 'admin'],
         default: 'student',
     },
+    avatar: {
+        type: String, 
+        default: 'https://example.com/default-avatar.png', 
+    },
 });
 
-UserSchema.pre('save', async function (next){
-    if(!this.isModified('password')) return next();
+// Middleware to hash password before saving
+UserSchema.pre('save', async function (next) {
+    if (!this.isModified('password')) return next();
     this.password = await bcrypt.hash(this.password, 10);
     next();
-})
+});
 
 const User = mongoose.model('User', UserSchema);
 module.exports = User;
