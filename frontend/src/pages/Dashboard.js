@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import axios from 'axios';
+import AdminDashboard from '../components/AdminDashboard';
 
 const Dashboard = () => {
   const [user, setUser] = useState(null);
