@@ -13,6 +13,7 @@ const adminRoutes = require('./routes/adminRoute');
 const enrollmentRoutes = require('./routes/enrollmentRoutes');
 const lessonRoutes = require('./routes/lessonRoutes');
 const messageRoutes = require('./routes/messageRoutes');
+const adminForUserRoutes = require('./routes/admin');
 
 
 const app = express();
@@ -73,6 +74,10 @@ app.use('/api/user-role', adminRoutes);
 app.use('/api/enroll', enrollmentRoutes);
 app.use('/api/lesson', lessonRoutes);
 app.use('/api/messages/send-receive', messageRoutes);
+
+// Role-Based Routes
+app.use('/api/admin', adminForUserRoutes);
+
 
 // MongoDB connection
 mongoose
