@@ -25,16 +25,30 @@ const Dashboard = () => {
 
   if (!user) return <p>Loading...</p>;
 
+  const renderRoleBasedContent = () => {
+    switch (user.role) {
+      case 'admin':
+        return <AdminDashboard />;
+      case 'instructor':
+        return <InstructorDashboard />;
+      case 'student':
+        return <StudentDashboard />;
+      default:
+        return <p>Invalid role</p>;
+    }
+  };
+
   return (
     <div className="dashboard">
       <Sidebar role={user.role} />
       <main>
         <h1>Welcome, {user.name}</h1>
-        {/* Add additional dashboard content here */}
+        {renderRoleBasedContent()}
       </main>
     </div>
   );
 };
+
 
 export default Dashboard;
 
