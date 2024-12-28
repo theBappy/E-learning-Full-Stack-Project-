@@ -3,6 +3,7 @@ const { protect } = require('../middleware/authMiddleware');
 const  checkRole  = require('../middleware/role');
 const User = require('../models/User');
 const { deleteUser } = require('../controllers/deleteUser');
+const { updateUserRole } = require('../controllers/updateUserRoleController');
 
 const router = express.Router();
 
@@ -16,6 +17,8 @@ router.get('/users', protect, checkRole('admin'), async (req, res) => {
 });
 
 router.delete('/users/:userId', protect, checkRole('admin'), deleteUser);
+
+router.patch('/users/:userId/role', protect, checkRole('admin'), updateUserRole);
 
 
 module.exports = router;
