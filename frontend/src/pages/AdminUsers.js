@@ -3,12 +3,14 @@ import axios from 'axios';
 
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);
+  const [search, setSearch] = useState('');
+  const [role, setRole] = useState('');
 
   useEffect(() => {
     // Fetch users on component mount
     const fetchUsers = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/admin/users', {
+        const response = await axios.get(`http://localhost:5000/api/admin/users?search=${search}&role=${role}`, {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
         });
         setUsers(response.data.users);
@@ -18,7 +20,7 @@ const AdminUsers = () => {
     };
 
     fetchUsers();
-  }, []);
+  }, [search, role]);
 
   const handleDelete = async (userId) => {
     if (window.confirm('Are you sure you want to delete this user?')) {
@@ -57,6 +59,20 @@ const AdminUsers = () => {
   return (
     <div>
       <h2>Manage Users</h2>
+      <div>
+        <input
+          type="text"
+          placeholder="Search by name or email"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <select value={role} onChange={(e) => setRole(e.target.value)}>
+          <option value="">All Roles</option>
+          <option value="student">Student</option>
+          <option value="instructor">Instructor</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
       <table>
         <thead>
           <tr>
