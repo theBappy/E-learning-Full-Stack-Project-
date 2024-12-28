@@ -15,9 +15,9 @@ router.get('/', getAllCourses);
 router.get('/:id', getCourseById);
 
 // Protected routes (Instructor and Admin)
-router.post('/',  checkRole(['admin', 'instructor']), addCourse);
-router.put('/:id',checkRole(['admin', 'instructor']), updateCourse);
-router.delete('/:id', checkRole(['admin']), deleteCourse);
+router.post('/create-course',  checkRole(['admin', 'instructor']), addCourse);
+router.put('/update-course/:id',checkRole(['admin', 'instructor']), updateCourse);
+router.delete('/delete-course/:id', checkRole(['admin']), deleteCourse);
 
 module.exports = router;
 
