@@ -35,6 +35,25 @@ const AdminUsers = () => {
     }
   };
 
+  const handleRoleUpdate = async (userId, newRole) => {
+    try {
+      await axios.patch(
+        `http://localhost:5000/api/admin/users/${userId}/role`,
+        { role: newRole },
+        { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+      );
+      alert('Role updated successfully');
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user._id === userId ? { ...user, role: newRole } : user
+        )
+      );
+    } catch (error) {
+      console.error('Error updating role:', error);
+      alert('Failed to update role');
+    }
+  };
+
   return (
     <div>
       <h2>Manage Users</h2>
@@ -52,7 +71,16 @@ const AdminUsers = () => {
             <tr key={user._id}>
               <td>{user.name}</td>
               <td>{user.email}</td>
-              <td>{user.role}</td>
+              <td>
+                <select
+                  value={user.role}
+                  onChange={(e) => handleRoleUpdate(user._id, e.target.value)}
+                >
+                  <option value="student">Student</option>
+                  <option value="instructor">Instructor</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </td>
               <td>
                 <button onClick={() => handleDelete(user._id)}>Delete</button>
               </td>
@@ -65,5 +93,6 @@ const AdminUsers = () => {
 };
 
 export default AdminUsers;
+
 
 
