@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import AdminUsers from './pages/AdminUsers';
 import AdminCourses from './pages/AdminCourses';
+import UserDashboard from './pages/UserDashboard';
 
 const App = () => {
   return (
@@ -20,6 +21,8 @@ const App = () => {
 
           <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/admin/courses" element={<AdminCourses />} />
+
+          <Route path="/student/enrollments" element={<UserDashboard />} />
           
         </Routes>
       </div>
