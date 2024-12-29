@@ -33,7 +33,9 @@ exports.addCourse = async (req, res) => {
 // Fetch all courses (Public)
 exports.getAllCourses = async (req, res) => {
   try {
-    const courses = await Course.find().populate('instructor', 'name email');
+    const courses = await Course.find({status: "active"})
+    .select("title description price instructor media")
+    .populate('instructor', 'name email');
     res.status(200).json({ courses }); 
   } catch (error) {
     res.status(500).json({ message: 'Error fetching courses' });
