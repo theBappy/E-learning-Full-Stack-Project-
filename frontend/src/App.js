@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import AdminUsers from './pages/AdminUsers';
+import AdminCourses from './pages/AdminCourses';
 
 const App = () => {
   return (
@@ -18,6 +19,7 @@ const App = () => {
           <Route path="/profile" element={<Profile />} />
 
           <Route path="/admin/users" element={<AdminUsers />} />
+          <Route path="/admin/courses" element={<AdminCourses />} />
           
         </Routes>
       </div>

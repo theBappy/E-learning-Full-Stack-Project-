@@ -8,11 +8,12 @@ const {
 } = require('../controllers/courseController');
 const checkRole = require('../middleware/role');
 
+
 const router = express.Router();
 
 // Public routes
 router.get('/', getAllCourses);
-router.get('/:id', getCourseById);
+router.get('/:id',  getCourseById);
 
 // Protected routes (Instructor and Admin)
 router.post('/create-course',  checkRole(['admin', 'instructor']), addCourse);

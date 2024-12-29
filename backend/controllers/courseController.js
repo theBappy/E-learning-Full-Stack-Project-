@@ -4,7 +4,7 @@ const Course = require('../models/Course');
 
 // Add a new course (Instructor only)
 exports.addCourse = async (req, res) => {
-  const { title, description, price, media } = req.body;
+  const { title, description, price, media, instructor, status } = req.body;
 
   try {
     if (req.user.role !== 'instructor' && req.user.role !== 'admin') {
@@ -17,6 +17,7 @@ exports.addCourse = async (req, res) => {
       price,
       media,
       instructor: req.user.id,
+      status: status || 'active',
     });
     await course.save();
 
@@ -33,9 +34,9 @@ exports.addCourse = async (req, res) => {
 exports.getAllCourses = async (req, res) => {
   try {
     const courses = await Course.find().populate('instructor', 'name email');
-    res.status(200).json(courses);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(200).json({ courses }); 
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching courses' });
   }
 };
 
@@ -53,14 +54,16 @@ exports.getCourseById = async (req, res) => {
 // Update a course (Instructor only)
 exports.updateCourse = async (req, res) => {
   try {
-    const course = await Course.findById(req.params.id);
+    const updates = req.body;
+
+    const course = await Course.findById(req.params.id, updates, {new: true});
 
     if (!course) throw new Error('Course not found');
     if (req.user.role !== 'instructor' && req.user.role !== 'admin') {
       return res.status(403).json({ error: 'Unauthorized to update this course' });
     }
 
-    Object.assign(course, req.body); // Update course fields
+    Object.assign(course, req.body); 
     await course.save();
     res.status(200).json({ message: 'Course updated successfully', course });
   } catch (err) {
