@@ -6,8 +6,8 @@ const checkRole = require('../middleware/role');
 
 const router = express.Router();
 
-router.post('/course/:id', protect, enrollInACourse);
-router.get('/my-courses', protect, getAllEnrolledCourse);
+router.post('/course-enroll', protect, enrollInACourse);
+router.get('/enrolled-courses', protect, getAllEnrolledCourse);
 router.get('/students/:id', checkRole(['admin', 'instructor']), viewEnrollment);
 
 module.exports = router;
