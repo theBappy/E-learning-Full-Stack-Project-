@@ -27,6 +27,16 @@ const CourseSchema = new mongoose.Schema(
     media: {
       type: String,
     },
+    createdAt: {
+      type: String,
+      deafault: Date.now(),
+    },
+    modules: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Module',
+      },
+    ],
     studentsEnrolled: [
       {
         type: mongoose.Schema.Types.ObjectId,
