@@ -24,6 +24,9 @@ const moduleSchema = new mongoose.Schema({
                 enum: ['video', 'text', 'quiz', 'pdf'],
                 required: true,
             },
+            content: {
+                type: String,
+            },
         },
     ],
     createdAt: {
