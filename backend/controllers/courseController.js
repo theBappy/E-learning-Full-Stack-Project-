@@ -49,7 +49,11 @@ exports.getAllCourses = async (req, res) => {
 exports.getCourseById = async (req, res) => {
   try {
     const course = await Course.findById(req.params.id)
-      .populate('instructor', 'name email');  // Populate instructor (user) details
+      .populate('instructor', 'name email')
+      .populate({
+         path: 'modules',
+         select: 'title description lessons',
+      });
     if (!course) throw new Error('Course not found');
     res.status(200).json(course);
   } catch (err) {
