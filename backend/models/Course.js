@@ -30,6 +30,10 @@ const CourseSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    progress: {
+        type: Number,
+        default: 0,
+    },
     studentsEnrolled: [{
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'User',
