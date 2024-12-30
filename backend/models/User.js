@@ -14,10 +14,11 @@ const UserSchema = new mongoose.Schema({
     password: {
         type: String,
         required: [true, 'Please provide your password'],
+        minlength: 6, 
     },
     role: {
         type: String,
-        enum: ['student', 'instructor', 'admin'],
+        enum: ['student', 'admin'],
         default: 'student',
     },
     avatar: {
@@ -35,3 +36,5 @@ UserSchema.pre('save', async function (next) {
 
 const User = mongoose.model('User', UserSchema);
 module.exports = User;
+
+
