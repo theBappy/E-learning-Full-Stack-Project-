@@ -1,4 +1,6 @@
 const nodemailer = require('nodemailer');
+const EmailLog = require('../models/EmailLog');
+
 
 const sendEmail = async ({ to, subject, text }) => {
   try {
@@ -19,7 +21,9 @@ const sendEmail = async ({ to, subject, text }) => {
 
     const info = await transporter.sendMail(mailOptions);
     console.log('Email sent: ', info.response); 
-    return info;
+
+    // Save Email Log
+    await EmailLog.create({recipient: to, subject, content: text});
   } catch (error) {
     console.error('Error sending email: ', error);
     throw error; 

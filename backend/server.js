@@ -15,6 +15,7 @@ const lessonRoutes = require('./routes/lessonRoutes');
 const messageRoutes = require('./routes/messageRoutes');
 const adminForUserRoutes = require('./routes/admin');
 const moduleRoutes = require('./routes/module');
+const dashboardRoutes = require('./routes/dashboardRoutes');
 
 
 const app = express();
@@ -76,6 +77,8 @@ app.use('/api/enroll', enrollmentRoutes);
 app.use('/api/lesson', lessonRoutes);
 app.use('/api/messages/send-receive', messageRoutes);
 app.use('/api/modules', moduleRoutes);
+app.use('/api/segregate-course', dashboardRoutes);
+
 
 // Role-Based Routes
 app.use('/api/admin', adminForUserRoutes);
