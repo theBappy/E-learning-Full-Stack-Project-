@@ -19,14 +19,12 @@ const enrolledCourseSchema = new Schema(
         ref: 'User', 
       },
     ],
-    progress: [
-      {
-        module: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'Module',
-        },
-      },
-    ],
+    progress: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 100, 
+    },
     lessonsCompleted: [String],
   },
   { timestamps: true }

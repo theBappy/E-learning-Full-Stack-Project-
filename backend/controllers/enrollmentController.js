@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Course = require('../models/Course');
 const EnrolledCourse = require('../models/EnrolledCourse');
-const sendCompletionEmail = require('../utils/sendEmail');
+const sendEmail = require('../utils/sendEmail');
 
 
 // Enroll in a course
@@ -79,37 +79,30 @@ exports.getAllEnrolledCourse = async (req, res) => {
 
 // Update progress in a course
 exports.progressCourses = async (req, res) => {
-  const { courseId, progress, lessonsCompleted } = req.body;
+  const { courseId, progress } = req.body;
 
   try {
     const enrolledCourse = await EnrolledCourse.findOneAndUpdate(
       { user: req.user._id, courseId },
-      { progress, lessonsCompleted },
+      { progress },
       { new: true }
-    ).populate({
-      path: 'courseId',
-      select: 'title modules',
-      populate: { path: 'modules', select: 'lessons' },
-    });
+    );
 
     if (!enrolledCourse) {
       return res.status(404).json({ message: 'Enrolled course not found' });
     }
 
-    // Check if the course is completed
-    const totalLessons = enrolledCourse.courseId.modules.reduce((total, module) => {
-      return total + module.lessons.length;
-    }, 0);
-
-    const completedLessons = lessonsCompleted.length;
-
-    if (progress === 100 && completedLessons === totalLessons) {
-      // Trigger course completion notification
-      sendCompletionEmail(req.user.email, enrolledCourse.courseId.title);
-      return res.status(200).json({
-        message: 'Progress updated and course completed!',
-        enrolledCourse,
+    // Send email confirmation
+    try {
+      console.log('Attempting to send email...');
+      await sendEmail({
+        to: req.user.email, // Make sure req.user.email exists
+        subject: 'Course Progress Update',
+        text: `Your progress for the course has been updated to ${progress}%.`,
       });
+      console.log('Email sent successfully.');
+    } catch (emailError) {
+      console.error('Failed to send email: ', emailError);
     }
 
     res.status(200).json({
@@ -124,6 +117,39 @@ exports.progressCourses = async (req, res) => {
     });
   }
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

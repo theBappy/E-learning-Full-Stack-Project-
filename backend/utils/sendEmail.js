@@ -1,29 +1,32 @@
 const nodemailer = require('nodemailer');
 
-const sendCompletionEmail = async (recipient, courseTitle) => {
+const sendEmail = async ({ to, subject, text }) => {
   try {
     const transporter = nodemailer.createTransport({
-      service: 'Gmail', 
+      service: 'gmail', 
       auth: {
-        user: 'abappy575@gmail.com',
-        pass: 'yfxna mzni hrsx ddjn', 
+        user: process.env.EMAIL, 
+        pass: process.env.PASS, 
       },
     });
 
     const mailOptions = {
-      from: 'abappy575@gmail.com',
-      to: recipient,
-      subject: `Congratulations on completing ${courseTitle}!`,
-      html: `<h1>Congratulations!</h1>
-             <p>You've successfully completed the course: <strong>${courseTitle}</strong>.</p>
-             <p>Keep up the great work and explore more courses to enhance your knowledge!</p>`,
+      from: process.env.EMAIL,
+      to,
+      subject,
+      text,
     };
 
-    await transporter.sendMail(mailOptions);
-    console.log('Completion email sent successfully.');
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Email sent: ', info.response); 
+    return info;
   } catch (error) {
-    console.error('Error sending email:', error);
+    console.error('Error sending email: ', error);
+    throw error; 
   }
 };
 
-module.exports = sendCompletionEmail;
+module.exports = sendEmail;
+
+
+
