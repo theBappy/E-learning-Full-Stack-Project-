@@ -82,27 +82,42 @@ exports.progressCourses = async (req, res) => {
   const { courseId, progress } = req.body;
 
   try {
-    const enrolledCourse = await EnrolledCourse.findOneAndUpdate(
-      { user: req.user._id, courseId },
-      { progress },
-      { new: true }
-    );
 
-    if (!enrolledCourse) {
+    const existingCourse = await EnrolledCourse.findOne({
+      user: req.user._id,
+      courseId,
+    }).populate('courseId'); 
+
+    if (!existingCourse) {
       return res.status(404).json({ message: 'Enrolled course not found' });
     }
 
-    // Send email confirmation
-    try {
-      console.log('Attempting to send email...');
+
+    const enrolledCourse = await EnrolledCourse.findOneAndUpdate(
+      { user: req.user._id, courseId },
+      { progress, completed: progress === 100 },
+      { new: true }
+    ).populate('courseId'); 
+
+
+    if (progress === 100 && !existingCourse.completed) {
+      console.log('Sending completion email to student...');
       await sendEmail({
-        to: req.user.email, // Make sure req.user.email exists
-        subject: 'Course Progress Update',
-        text: `Your progress for the course has been updated to ${progress}%.`,
+        to: req.user.email,
+        subject: 'Congratulations on Completing Your Course!',
+        text: `You have successfully completed the course "${enrolledCourse.courseId.title}". Keep learning!`,
       });
-      console.log('Email sent successfully.');
-    } catch (emailError) {
-      console.error('Failed to send email: ', emailError);
+      
+
+      const adminEmails = process.env.ADMIN_EMAILS.split(',');
+      for(const adminEmail of adminEmails){
+        await sendEmail({
+          to: adminEmail,
+          subject: `Course completion notification ${enrolledCourse.courseId.title}`,
+          text: `User ${req.user.name} (${req.user.email}) has successfully completed the course "${enrolledCourse.courseId.title}".`,
+        });
+      }
+      console.log('Admin notifications sent.')
     }
 
     res.status(200).json({
@@ -110,13 +125,16 @@ exports.progressCourses = async (req, res) => {
       enrolledCourse,
     });
   } catch (error) {
-    console.error(error);
+    console.error('Error in progressCourses:', error);
     res.status(500).json({
       message: 'Failed to update progress',
       error: error.message,
     });
   }
 };
+
+
+
 
 
 
