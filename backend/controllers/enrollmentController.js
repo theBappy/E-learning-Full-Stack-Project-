@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Course = require('../models/Course');
 const EnrolledCourse = require('../models/EnrolledCourse');
+const sendCompletionEmail = require('../utils/sendEmail');
 
 
 // Enroll in a course
@@ -47,7 +48,7 @@ exports.enrollInACourse = async (req, res) => {
 };
 
 
-// Get all enrolled courses
+
 // Get all enrolled courses
 exports.getAllEnrolledCourse = async (req, res) => {
   try {
@@ -55,8 +56,19 @@ exports.getAllEnrolledCourse = async (req, res) => {
       .populate({
         path: 'courseId', 
         select: 'title description price instructor',
-        populate: { path: 'instructor', select: 'name email' }, 
+        populate: { 
+          path: 'instructor', 
+          select: 'name email',
+         }, 
+         populate: {
+           path: 'modules',
+           select: 'title description lessons',
+         },
       });
+      if (!courses
+        .length) {
+        return res.status(404).json({ message: 'No enrolled courses found' });
+      }
 
     res.status(200).json({ courses });
   } catch (error) {
@@ -67,17 +79,37 @@ exports.getAllEnrolledCourse = async (req, res) => {
 
 // Update progress in a course
 exports.progressCourses = async (req, res) => {
-  const { courseId, progress } = req.body;
+  const { courseId, progress, lessonsCompleted } = req.body;
 
   try {
     const enrolledCourse = await EnrolledCourse.findOneAndUpdate(
       { user: req.user._id, courseId },
-      { progress },
+      { progress, lessonsCompleted },
       { new: true }
-    );
+    ).populate({
+      path: 'courseId',
+      select: 'title modules',
+      populate: { path: 'modules', select: 'lessons' },
+    });
 
     if (!enrolledCourse) {
       return res.status(404).json({ message: 'Enrolled course not found' });
+    }
+
+    // Check if the course is completed
+    const totalLessons = enrolledCourse.courseId.modules.reduce((total, module) => {
+      return total + module.lessons.length;
+    }, 0);
+
+    const completedLessons = lessonsCompleted.length;
+
+    if (progress === 100 && completedLessons === totalLessons) {
+      // Trigger course completion notification
+      sendCompletionEmail(req.user.email, enrolledCourse.courseId.title);
+      return res.status(200).json({
+        message: 'Progress updated and course completed!',
+        enrolledCourse,
+      });
     }
 
     res.status(200).json({
