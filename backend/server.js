@@ -16,6 +16,7 @@ const messageRoutes = require('./routes/messageRoutes');
 const adminForUserRoutes = require('./routes/admin');
 const moduleRoutes = require('./routes/module');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const certificateRoutes = require('./routes/certificateRoutes');
 
 
 const app = express();
@@ -78,6 +79,7 @@ app.use('/api/lesson', lessonRoutes);
 app.use('/api/messages/send-receive', messageRoutes);
 app.use('/api/modules', moduleRoutes);
 app.use('/api/segregate-course', dashboardRoutes);
+app.use('/api/certificate', certificateRoutes);
 
 
 // Role-Based Routes
