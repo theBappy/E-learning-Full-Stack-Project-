@@ -2,9 +2,16 @@ const EnrolledCourse = require('../models/EnrolledCourse');
 
 exports.getDashboardData = async (req, res) => {
   try {
-    const enrolledCourses = await EnrolledCourse.find({ user: req.user._id }).populate('courseId');
+    const enrolledCourses = await EnrolledCourse.find({ user: req.user._id })
+      .populate({
+        path: 'courseId',
+        populate: {
+          path: 'instructor', 
+          select: 'name email', 
+        },
+      });
 
-    // Segregate courses
+    
     const completedCourses = enrolledCourses.filter(course => course.completed);
     const inProgressCourses = enrolledCourses.filter(course => !course.completed);
 
@@ -17,3 +24,4 @@ exports.getDashboardData = async (req, res) => {
     res.status(500).json({ message: 'Failed to fetch dashboard data', error: error.message });
   }
 };
+

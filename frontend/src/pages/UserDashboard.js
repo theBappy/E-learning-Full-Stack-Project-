@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Pie } from "react-chartjs-2";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 const UserDashboard = () => {
-  const [availableCourses, setAvailableCourses] = useState([]); // Available courses
-  const [completedCourses, setCompletedCourses] = useState([]); // Completed courses
-  const [inProgressCourses, setInProgressCourses] = useState([]); // In-progress courses
+  const [availableCourses, setAvailableCourses] = useState([]);
+  const [completedCourses, setCompletedCourses] = useState([]);
+  const [inProgressCourses, setInProgressCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({ completedPercentage: 0, inProgressPercentage: 0 });
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        // Fetch available courses and segregated enrolled courses concurrently
         const [availableRes, segregateRes] = await Promise.all([
           axios.get("http://localhost:5000/api/course", {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -21,11 +25,15 @@ const UserDashboard = () => {
           }),
         ]);
 
-        setAvailableCourses(availableRes.data.courses);
-        setCompletedCourses(segregateRes.data.completedCourses);
-        setInProgressCourses(segregateRes.data.inProgressCourses);
+        console.log(segregateRes.data); // Debug log for API response
+
+        setAvailableCourses(availableRes.data.courses || []);
+        setCompletedCourses(segregateRes.data.completedCourses || []);
+        setInProgressCourses(segregateRes.data.inProgressCourses || []);
+        setStats(segregateRes.data.stats || { completedPercentage: 0, inProgressPercentage: 0 });
         setLoading(false);
       } catch (err) {
+        console.error("Error fetching dashboard data:", err);
         setError("Failed to fetch dashboard data");
         setLoading(false);
       }
@@ -33,6 +41,18 @@ const UserDashboard = () => {
 
     fetchDashboardData();
   }, []);
+
+  const chartData = {
+    labels: ["Completed Courses", "In-Progress Courses"],
+    datasets: [
+      {
+        label: "Course Progress",
+        data: [stats.completedPercentage, stats.inProgressPercentage],
+        backgroundColor: ["#4CAF50", "#FFC107"],
+        hoverOffset: 4,
+      },
+    ],
+  };
 
   const handleEnroll = async (courseId) => {
     try {
@@ -43,6 +63,7 @@ const UserDashboard = () => {
       );
       alert("Enrolled successfully!");
     } catch (err) {
+      console.error("Enrollment failed:", err);
       alert("Failed to enroll in course");
     }
   };
@@ -56,6 +77,7 @@ const UserDashboard = () => {
       );
       alert("Progress updated successfully!");
     } catch (err) {
+      console.error("Progress update failed:", err);
       alert("Failed to update progress");
     }
   };
@@ -76,6 +98,11 @@ const UserDashboard = () => {
             <button onClick={() => handleEnroll(course._id)}>Enroll</button>
           </div>
         ))}
+      </div>
+
+      <div>
+        <h2>Course Progress Overview</h2>
+        <Pie data={chartData} />
       </div>
 
       <h2>In-Progress Courses</h2>
@@ -113,6 +140,8 @@ const UserDashboard = () => {
 };
 
 export default UserDashboard;
+
+
 
 
 
