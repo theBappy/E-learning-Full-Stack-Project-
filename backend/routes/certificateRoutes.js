@@ -47,4 +47,35 @@ router.post("/generate", protect, async (req, res) => {
   }
 });
 
+
+// Validate Certificate
+router.get("/validate/:certificateId", protect, async (req, res) => {
+  try {
+    const { certificateId } = req.params;
+
+    
+    const certificate = await Certificate.findOne({ certificateId })
+      .populate("userId", "name email")
+      .populate("courseId", "title");
+
+    if (!certificate) {
+      return res.status(404).json({ message: "Certificate not found" });
+    }
+
+    res.status(200).json({
+      message: "Certificate is valid",
+      certificate: {
+        certificateId: certificate.certificateId,
+        userName: certificate.userId.name,
+        userEmail: certificate.userId.email,
+        courseTitle: certificate.courseId.title,
+        issueDate: certificate.issueDate,
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 module.exports = router;
