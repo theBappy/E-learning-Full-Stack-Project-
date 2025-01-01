@@ -2,33 +2,36 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 const UserDashboard = () => {
-  const [courses, setCourses] = useState([]); // Available courses
-  const [enrolledCourses, setEnrolledCourses] = useState([]); // Enrolled courses
+  const [availableCourses, setAvailableCourses] = useState([]); // Available courses
+  const [completedCourses, setCompletedCourses] = useState([]); // Completed courses
+  const [inProgressCourses, setInProgressCourses] = useState([]); // In-progress courses
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchCourses = async () => {
+    const fetchDashboardData = async () => {
       try {
-        const [availableRes, enrolledRes] = await Promise.all([
+        // Fetch available courses and segregated enrolled courses concurrently
+        const [availableRes, segregateRes] = await Promise.all([
           axios.get("http://localhost:5000/api/course", {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
           }),
-          axios.get("http://localhost:5000/api/enroll/enrolled-courses", {
+          axios.get("http://localhost:5000/api/segregate-course/data", {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
           }),
         ]);
 
-        setCourses(availableRes.data.courses);
-        setEnrolledCourses(enrolledRes.data.courses);
+        setAvailableCourses(availableRes.data.courses);
+        setCompletedCourses(segregateRes.data.completedCourses);
+        setInProgressCourses(segregateRes.data.inProgressCourses);
         setLoading(false);
       } catch (err) {
-        setError("Failed to fetch courses");
+        setError("Failed to fetch dashboard data");
         setLoading(false);
       }
     };
 
-    fetchCourses();
+    fetchDashboardData();
   }, []);
 
   const handleEnroll = async (courseId) => {
@@ -57,14 +60,14 @@ const UserDashboard = () => {
     }
   };
 
-  if (loading) return <p>Loading courses...</p>;
+  if (loading) return <p>Loading dashboard...</p>;
   if (error) return <p>{error}</p>;
 
   return (
     <div>
       <h2>Available Courses</h2>
       <div>
-        {courses.map((course) => (
+        {availableCourses.map((course) => (
           <div key={course._id}>
             <h3>{course.title}</h3>
             <p>{course.description}</p>
@@ -75,9 +78,9 @@ const UserDashboard = () => {
         ))}
       </div>
 
-      <h2>Enrolled Courses</h2>
+      <h2>In-Progress Courses</h2>
       <div>
-        {enrolledCourses.map((course) => (
+        {inProgressCourses.map((course) => (
           <div key={course._id}>
             <h3>{course.courseId?.title || "Untitled Course"}</h3>
             <p>{course.courseId?.description || "No description available"}</p>
@@ -93,10 +96,23 @@ const UserDashboard = () => {
           </div>
         ))}
       </div>
+
+      <h2>Completed Courses</h2>
+      <div>
+        {completedCourses.map((course) => (
+          <div key={course._id}>
+            <h3>{course.courseId?.title || "Untitled Course"}</h3>
+            <p>{course.courseId?.description || "No description available"}</p>
+            <p>Instructor: {course.courseId?.instructor?.name || "N/A"}</p>
+            <p>Completion Date: {new Date(course.updatedAt).toLocaleDateString()}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
 
 export default UserDashboard;
+
 
 
