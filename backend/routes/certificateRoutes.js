@@ -47,9 +47,27 @@ router.post("/generate", protect, async (req, res) => {
   }
 });
 
+// Get all certificates for a specific user
+router.get("/user-certificates", protect, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const certificates = await Certificate.find({ userId }).populate("courseId", "title");
+
+    if (!certificates.length) {
+      return res.status(404).json({ message: "No certificates found for this user." });
+    }
+
+    res.status(200).json({ certificates });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+
 
 // Validate Certificate
-router.get("/validate/:certificateId", protect, async (req, res) => {
+router.get("/validate/:certificateId", async (req, res) => {
   try {
     const { certificateId } = req.params;
 
