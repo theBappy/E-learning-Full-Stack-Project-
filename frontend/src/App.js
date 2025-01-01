@@ -8,6 +8,7 @@ import Profile from './pages/Profile';
 import AdminUsers from './pages/AdminUsers';
 import AdminCourses from './pages/AdminCourses';
 import UserDashboard from './pages/UserDashboard';
+import CertificateValidation from './components/CertificateValidation';
 
 const App = () => {
   return (
@@ -23,6 +24,7 @@ const App = () => {
           <Route path="/admin/courses" element={<AdminCourses />} />
 
           <Route path="/student/enrollments" element={<UserDashboard />} />
+          <Route path="/certificate/validate" element={<CertificateValidation />} />
           
         </Routes>
       </div>

@@ -20,6 +20,7 @@ const Sidebar = ({ role }) => {
   const studentLinks = [
     { name: 'My Enrollments', path: '/student/enrollments' },
     { name: 'View Lessons', path: '/student/lessons' },
+    { name: 'View Certificate', path: '/certificate/validate' },
   ];
 
   const roleBasedLinks = {
