@@ -51,7 +51,9 @@ router.post("/generate", protect, async (req, res) => {
 router.get("/user-certificates", protect, async (req, res) => {
   try {
     const userId = req.user.id;
-    const certificates = await Certificate.find({ userId }).populate("courseId", "title");
+    const certificates = await Certificate.find({ userId })
+              .populate("userId", "name email")
+              .populate("courseId", "title");
 
     if (!certificates.length) {
       return res.status(404).json({ message: "No certificates found for this user." });

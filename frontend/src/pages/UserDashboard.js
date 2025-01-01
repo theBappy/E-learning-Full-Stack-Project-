@@ -9,6 +9,7 @@ const UserDashboard = () => {
   const [availableCourses, setAvailableCourses] = useState([]);
   const [completedCourses, setCompletedCourses] = useState([]);
   const [inProgressCourses, setInProgressCourses] = useState([]);
+  const [userCertificates, setUserCertificates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({ completedPercentage: 0, inProgressPercentage: 0 });
   const [error, setError] = useState(null);
@@ -16,21 +17,26 @@ const UserDashboard = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const [availableRes, segregateRes] = await Promise.all([
+        const [availableRes, segregateRes, certificatesRes] = await Promise.all([
           axios.get("http://localhost:5000/api/course", {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
           }),
           axios.get("http://localhost:5000/api/segregate-course/data", {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
           }),
+          axios.get("http://localhost:5000/api/certificate/user-certificates", {
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          }),
         ]);
 
-        console.log(segregateRes.data); // Debug log for API response
+        console.log(segregateRes.data); // Debug log for course API response
+        console.log(certificatesRes.data); // Debug log for certificates API response
 
         setAvailableCourses(availableRes.data.courses || []);
         setCompletedCourses(segregateRes.data.completedCourses || []);
         setInProgressCourses(segregateRes.data.inProgressCourses || []);
         setStats(segregateRes.data.stats || { completedPercentage: 0, inProgressPercentage: 0 });
+        setUserCertificates(certificatesRes.data.certificates || []);
         setLoading(false);
       } catch (err) {
         console.error("Error fetching dashboard data:", err);
@@ -135,11 +141,30 @@ const UserDashboard = () => {
           </div>
         ))}
       </div>
+
+      <h2>User Certificates</h2>
+      <div>
+        {userCertificates.length > 0 ? (
+          userCertificates.map((certificate) => (
+            <div key={certificate._id}>
+              <h3>Certificate for: {certificate.courseId?.title || "Untitled Course"}</h3>
+              <p>Issued On: {new Date(certificate.issueDate).toLocaleDateString()}</p>
+              <p>Certificate ID: {certificate.certificateId}</p>
+              <button onClick={() => navigator.clipboard.writeText(certificate.certificateId)}>
+                Copy Certificate ID
+              </button>
+            </div>
+          ))
+        ) : (
+          <p>No certificates earned yet.</p>
+        )}
+      </div>
     </div>
   );
 };
 
 export default UserDashboard;
+
 
 
 

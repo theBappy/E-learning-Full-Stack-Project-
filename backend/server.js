@@ -6,6 +6,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 
 
+
 // Routes Imports
 const authRoutes = require('./routes/authRoutes');
 const courseRoutes = require('./routes/courseRoutes');
@@ -17,6 +18,7 @@ const adminForUserRoutes = require('./routes/admin');
 const moduleRoutes = require('./routes/module');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const certificateRoutes = require('./routes/certificateRoutes');
+const pdfRoutes = require('./routes/PDFDocument');
 
 
 const app = express();
@@ -80,6 +82,8 @@ app.use('/api/messages/send-receive', messageRoutes);
 app.use('/api/modules', moduleRoutes);
 app.use('/api/segregate-course', dashboardRoutes);
 app.use('/api/certificate', certificateRoutes);
+app.use('/api/certificate/download', pdfRoutes);
+
 
 
 // Role-Based Routes
