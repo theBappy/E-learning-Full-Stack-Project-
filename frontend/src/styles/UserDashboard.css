@@ -1,0 +1,47 @@
+.dashboard-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr ;
+    grid-template-rows: auto auto auto auto;
+    grid-template-areas:
+      "available-courses available-courses user-certificates"
+      "in-progress-courses in-progress-courses completed-courses"
+      "course-progress course-progress course-progress";
+    gap: 20px;
+    margin: 20px;
+  }
+  
+  .section {
+    padding: 20px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+  }
+  
+  .available-courses {
+    grid-area: available-courses;
+  }
+  
+  .course-progress {
+    grid-area: course-progress;
+  }
+  
+  .in-progress-courses {
+    grid-area: in-progress-courses;
+  }
+  
+  .completed-courses {
+    grid-area: completed-courses;
+  }
+  
+  .user-certificates {
+    grid-area: user-certificates;
+  }
+  
+  .course-card, .certificate-card {
+    margin-bottom: 20px;
+  }
+  
+  .pie-chart {
+    height: 200px; 
+  }
+  
